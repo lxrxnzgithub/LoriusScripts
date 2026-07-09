@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Hub — Lorius Scripts</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">LS</span>
+        Lorius Scripts
+      </a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="scripts.html">Scripts</a></li>
+        <li><a href="suggestions.html">Suggestions</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="admin.html">Admin</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-header">
+      <div class="container">
+        <h1 class="fade-in">Admin Hub</h1>
+        <p class="fade-in fade-in-delay-1">
+          Manage the script catalog: add, edit and remove scripts without touching code.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 1rem;">
+      <div class="container">
+        <p class="admin-note fade-in fade-in-delay-2" id="admin-status">
+          Changes save instantly to this browser for previewing. To publish for all
+          visitors, click <strong>Export JSON</strong> and replace
+          <code>data/scripts.json</code> in the repository with the downloaded file.
+        </p>
+
+        <div class="admin-toolbar fade-in fade-in-delay-2">
+          <button type="button" id="admin-export" class="btn btn-primary btn-small">Export JSON</button>
+          <label class="btn btn-secondary btn-small" style="cursor: pointer;">
+            Import JSON
+            <input type="file" id="admin-import" accept="application/json,.json" hidden>
+          </label>
+          <button type="button" id="admin-reset" class="btn btn-secondary btn-small">Discard Local Changes</button>
+          <a href="scripts.html" class="btn btn-secondary btn-small">Preview Scripts Page</a>
+        </div>
+
+        <div class="admin-layout">
+          <div class="admin-panel fade-in fade-in-delay-2">
+            <h2 id="admin-form-title">Add New Script</h2>
+            <form id="admin-form">
+              <div class="form-group">
+                <label for="game">Game name</label>
+                <input type="text" id="game" name="game" placeholder="e.g. Blox Fruits" required>
+              </div>
+              <div class="form-group">
+                <label for="logo">Logo URL <span class="hint">(optional — e.g. assets/logos/game.png)</span></label>
+                <input type="text" id="logo" name="logo" placeholder="assets/logos/game.png">
+              </div>
+              <div class="form-group">
+                <label for="description">Script description</label>
+                <textarea id="description" name="description" placeholder="What does this script do?" required></textarea>
+              </div>
+              <div class="form-group">
+                <label for="script">Script content</label>
+                <textarea id="script" name="script" placeholder='loadstring(game:HttpGet("..."))()' required style="font-family: monospace;"></textarea>
+              </div>
+              <div style="display: flex; gap: 0.6rem;">
+                <button type="submit" class="btn btn-primary">Save Script</button>
+                <button type="button" id="admin-cancel" class="btn btn-secondary" style="display: none;">Cancel Edit</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="admin-panel fade-in fade-in-delay-3">
+            <h2>Current Scripts</h2>
+            <ul id="admin-list" class="admin-list"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© <span data-year>2026</span> Lorius Scripts. All rights reserved.</span>
+      <nav>
+        <a href="scripts.html">Scripts</a>
+        <a href="suggestions.html">Suggestions</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/scripts-data.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

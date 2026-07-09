@@ -1,0 +1,25 @@
+{
+  "scripts": [
+    {
+      "id": "blox-fruits-hub",
+      "game": "Blox Fruits",
+      "logo": "assets/logos/blox-fruits.png",
+      "description": "Auto-farm hub with quest helper, teleports and fruit finder. Updated for the latest version.",
+      "script": "loadstring(game:HttpGet(\"https://example.com/loriusscripts/blox-fruits.lua\"))()"
+    },
+    {
+      "id": "pet-simulator-99",
+      "game": "Pet Simulator 99",
+      "logo": "assets/logos/pet-sim-99.png",
+      "description": "Auto-collect coins, auto-hatch eggs and inventory sorting in one lightweight script.",
+      "script": "loadstring(game:HttpGet(\"https://example.com/loriusscripts/pet-sim-99.lua\"))()"
+    },
+    {
+      "id": "brookhaven-utils",
+      "game": "Brookhaven RP",
+      "logo": "assets/logos/brookhaven.png",
+      "description": "Utility pack: speed controls, teleport menu and fun cosmetic toggles for Brookhaven RP.",
+      "script": "loadstring(game:HttpGet(\"https://example.com/loriusscripts/brookhaven.lua\"))()"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suggestions — Lorius Scripts</title>
+  <meta name="description" content="Suggest a new Roblox script or site feature for Lorius Scripts.">
+
+  <!-- ============================================================
+       ADSENSE VERIFICATION / AUTO ADS
+       Paste your AdSense code snippet here after approval.
+       ============================================================ -->
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="container">
+      <a class="brand" href="index.html">
+        <span class="brand-mark">LS</span>
+        Lorius Scripts
+      </a>
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="scripts.html">Scripts</a></li>
+        <li><a href="suggestions.html">Suggestions</a></li>
+        <li><a href="about.html">About</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main>
+    <section class="page-header">
+      <div class="container">
+        <h1 class="fade-in">Suggestions</h1>
+        <p class="fade-in fade-in-delay-1">
+          Want a script for a game we don't cover yet, or an idea to make the site
+          better? Tell us about it — the best suggestions go straight on the roadmap.
+        </p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 1.5rem;">
+      <div class="container">
+        <form id="suggestion-form" class="form-card fade-in fade-in-delay-2" novalidate>
+          <div id="form-message" class="form-message" role="status"></div>
+
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name or nickname" required>
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email <span class="hint">(optional — only if you'd like a reply)</span></label>
+            <input type="email" id="email" name="email" placeholder="you@example.com">
+          </div>
+
+          <div class="form-group">
+            <label for="suggestion">Your suggestion</label>
+            <textarea id="suggestion" name="suggestion" placeholder="Which game should we add a script for? What feature would you like to see?" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Send Suggestion</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Ad slot: below the form -->
+    <div class="ad-slot" aria-hidden="true">
+      <div class="ad-placeholder">Advertisement</div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <span>© <span data-year>2026</span> Lorius Scripts. All rights reserved.</span>
+      <nav>
+        <a href="scripts.html">Scripts</a>
+        <a href="suggestions.html">Suggestions</a>
+        <a href="about.html">About</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script src="js/suggestions.js"></script>
+</body>
+</html>

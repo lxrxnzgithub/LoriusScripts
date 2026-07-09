@@ -5,7 +5,7 @@
       "game": "Blox Fruits",
       "logo": "assets/logos/blox-fruits.png",
       "description": "Auto-farm hub with quest helper, teleports and fruit finder. Updated for the latest version.",
-      "script": "loadstring(game:HttpGet(\"https://example.com/loriusscripts/blox-fruits.lua\"))()"
+      "script": "pogiako"
     },
     {
       "id": "pet-simulator-99",

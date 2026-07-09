@@ -1,12 +1,13 @@
 /**
  * Lorius Scripts — Admin Hub.
  *
- * A lightweight, client-side CMS for the script catalog:
- *   - add, edit and delete scripts through a form
- *   - changes save instantly to localStorage (visible on this browser)
- *   - "Export JSON" downloads the catalog in the data/scripts.json shape
+ * A lightweight, client-side CMS for both catalogs (Scripts and Executors):
+ *   - switch between catalogs with the tabs at the top
+ *   - add, edit and delete items (including changing each item's logo URL)
+ *   - changes save instantly to localStorage (visible in this browser only)
+ *   - "Export JSON" downloads the current catalog in its data/*.json shape
  *     so it can be committed to publish changes for every visitor
- *   - "Import JSON" loads an existing scripts.json into the editor
+ *   - "Import JSON" loads an existing catalog file into the editor
  *
  * Note: this hub has no authentication — it is a convenience editor for the
  * site owner. Anything saved here only affects the current browser until
@@ -20,30 +21,51 @@
   if (!form || !list) return;
 
   const formTitle = document.getElementById("admin-form-title");
+  const listTitle = document.getElementById("admin-list-title");
   const cancelBtn = document.getElementById("admin-cancel");
   const exportBtn = document.getElementById("admin-export");
   const importInput = document.getElementById("admin-import");
   const resetBtn = document.getElementById("admin-reset");
   const statusNote = document.getElementById("admin-status");
+  const tabButtons = document.querySelectorAll(".admin-tabs button[data-type]");
 
-  let scripts = [];
+  const nameLabel = document.getElementById("label-name");
+  const groupScript = document.getElementById("group-script");
+  const groupDownload = document.getElementById("group-download");
+
+  let type = "scripts";
+  let items = [];
   let editingId = null;
+
+  function isExecutors() {
+    return type === "executors";
+  }
+
+  function label() {
+    return isExecutors() ? "executor" : "script";
+  }
 
   function setStatus(text) {
     if (statusNote) statusNote.textContent = text;
   }
 
   function persist() {
-    LoriusData.saveLocal(scripts);
+    LoriusData.saveLocal(type, items);
     setStatus(
-      "Changes saved to this browser. Export JSON and replace data/scripts.json to publish for everyone."
+      "Changes saved to this browser. Export JSON and replace data/" +
+        LoriusData.exportFileName(type) +
+        " to publish for everyone."
     );
   }
 
   function uniqueId(base) {
     let id = LoriusData.slugify(base);
     let suffix = 2;
-    const existing = new Set(scripts.map(function (s) { return s.id; }));
+    const existing = new Set(
+      items.map(function (s) {
+        return s.id;
+      })
+    );
     while (existing.has(id)) {
       id = LoriusData.slugify(base) + "-" + suffix++;
     }
@@ -53,24 +75,40 @@
   function resetForm() {
     form.reset();
     editingId = null;
-    formTitle.textContent = "Add New Script";
+    formTitle.textContent = isExecutors() ? "Add New Executor" : "Add New Script";
     cancelBtn.style.display = "none";
+  }
+
+  function applyTypeToForm() {
+    nameLabel.textContent = isExecutors() ? "Executor name" : "Game name";
+    groupScript.style.display = isExecutors() ? "none" : "";
+    groupDownload.style.display = isExecutors() ? "" : "none";
+    form.elements.script.required = !isExecutors();
+    form.elements.download.required = isExecutors();
+    listTitle.textContent = isExecutors() ? "Current Executors" : "Current Scripts";
+    exportBtn.textContent = "Export " + LoriusData.exportFileName(type);
   }
 
   function startEdit(item) {
     editingId = item.id;
-    form.elements.game.value = item.game;
+    form.elements.name.value = LoriusData.itemName(item);
     form.elements.logo.value = item.logo || "";
-    form.elements.description.value = item.description;
-    form.elements.script.value = item.script;
-    formTitle.textContent = "Edit: " + item.game;
+    form.elements.description.value = item.description || "";
+    if (isExecutors()) {
+      form.elements.download.value = item.download || "";
+    } else {
+      form.elements.script.value = item.script || "";
+    }
+    formTitle.textContent = "Edit: " + LoriusData.itemName(item);
     cancelBtn.style.display = "inline-flex";
     form.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function removeScript(item) {
-    if (!window.confirm('Delete "' + item.game + '"?')) return;
-    scripts = scripts.filter(function (s) { return s.id !== item.id; });
+  function removeItem(item) {
+    if (!window.confirm('Delete "' + LoriusData.itemName(item) + '"?')) return;
+    items = items.filter(function (s) {
+      return s.id !== item.id;
+    });
     if (editingId === item.id) resetForm();
     persist();
     renderList();
@@ -78,20 +116,20 @@
 
   function renderList() {
     list.innerHTML = "";
-    if (!scripts.length) {
+    if (!items.length) {
       const empty = document.createElement("li");
-      empty.textContent = "No scripts yet. Add one with the form.";
+      empty.textContent = "Nothing here yet. Add one with the form.";
       empty.style.color = "var(--text-muted)";
       empty.style.border = "none";
       list.appendChild(empty);
       return;
     }
-    scripts.forEach(function (item) {
+    items.forEach(function (item) {
       const li = document.createElement("li");
 
       const name = document.createElement("span");
       name.className = "item-name";
-      name.textContent = item.game;
+      name.textContent = LoriusData.itemName(item);
 
       const actions = document.createElement("div");
       actions.className = "item-actions";
@@ -100,13 +138,17 @@
       editBtn.type = "button";
       editBtn.className = "btn btn-secondary btn-small";
       editBtn.textContent = "Edit";
-      editBtn.addEventListener("click", function () { startEdit(item); });
+      editBtn.addEventListener("click", function () {
+        startEdit(item);
+      });
 
       const deleteBtn = document.createElement("button");
       deleteBtn.type = "button";
       deleteBtn.className = "btn btn-danger btn-small";
       deleteBtn.textContent = "Delete";
-      deleteBtn.addEventListener("click", function () { removeScript(item); });
+      deleteBtn.addEventListener("click", function () {
+        removeItem(item);
+      });
 
       actions.appendChild(editBtn);
       actions.appendChild(deleteBtn);
@@ -116,28 +158,76 @@
     });
   }
 
+  function loadType(newType) {
+    type = newType;
+    tabButtons.forEach(function (btn) {
+      btn.classList.toggle("active", btn.dataset.type === type);
+    });
+    applyTypeToForm();
+    resetForm();
+    LoriusData.loadCatalog(type).then(function (loaded) {
+      items = loaded;
+      renderList();
+      if (LoriusData.hasLocalOverride(type)) {
+        setStatus(
+          "You have unpublished local " +
+            label() +
+            " changes. Export JSON and replace data/" +
+            LoriusData.exportFileName(type) +
+            " to publish them."
+        );
+      } else {
+        setStatus(
+          "Editing the " +
+            label() +
+            "s catalog. Changes preview in this browser; use Export JSON to publish."
+        );
+      }
+    });
+  }
+
+  tabButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      loadType(btn.dataset.type);
+    });
+  });
+
   form.addEventListener("submit", function (event) {
     event.preventDefault();
 
-    const entry = {
-      id: editingId || uniqueId(form.elements.game.value),
-      game: form.elements.game.value.trim(),
-      logo: form.elements.logo.value.trim(),
-      description: form.elements.description.value.trim(),
-      script: form.elements.script.value.trim()
-    };
+    const name = form.elements.name.value.trim();
+    const logo = form.elements.logo.value.trim();
+    const description = form.elements.description.value.trim();
 
-    if (!entry.game || !entry.description || !entry.script) {
-      setStatus("Game name, description and script content are required.");
+    if (!name || !description) {
+      setStatus("Name and description are required.");
       return;
     }
 
+    const entry = { id: editingId || uniqueId(name), logo: logo, description: description };
+
+    if (isExecutors()) {
+      entry.name = name;
+      entry.download = form.elements.download.value.trim();
+      if (!entry.download) {
+        setStatus("A download link is required for executors.");
+        return;
+      }
+    } else {
+      entry.game = name;
+      entry.script = form.elements.script.value.trim();
+      if (!entry.script) {
+        setStatus("Script content is required.");
+        return;
+      }
+    }
+
     if (editingId) {
-      scripts = scripts.map(function (s) {
+      items = items.map(function (s) {
         return s.id === editingId ? entry : s;
       });
     } else {
-      scripts.push(entry);
+      items.push(entry);
     }
 
     persist();
@@ -148,18 +238,24 @@
   cancelBtn.addEventListener("click", resetForm);
 
   exportBtn.addEventListener("click", function () {
-    const blob = new Blob([LoriusData.toJSON(scripts)], {
+    const blob = new Blob([LoriusData.toJSON(type, items)], {
       type: "application/json"
     });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "scripts.json";
+    link.download = LoriusData.exportFileName(type);
     document.body.appendChild(link);
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
-    setStatus("Exported scripts.json — replace data/scripts.json in the repo to publish.");
+    setStatus(
+      "Exported " +
+        LoriusData.exportFileName(type) +
+        " — replace data/" +
+        LoriusData.exportFileName(type) +
+        " in the repo to publish."
+    );
   });
 
   importInput.addEventListener("change", function () {
@@ -169,15 +265,16 @@
     reader.onload = function () {
       try {
         const data = JSON.parse(reader.result);
-        const imported = Array.isArray(data) ? data : data.scripts;
+        const rootKey = LoriusData.CATALOGS[type].rootKey;
+        const imported = Array.isArray(data) ? data : data[rootKey];
         if (!Array.isArray(imported)) throw new Error("Invalid format");
-        scripts = imported;
+        items = imported;
         persist();
         renderList();
         resetForm();
-        setStatus("Imported " + imported.length + " script(s).");
+        setStatus("Imported " + imported.length + " " + label() + "(s).");
       } catch (err) {
-        setStatus("Import failed: the file is not a valid scripts JSON.");
+        setStatus("Import failed: the file is not a valid " + label() + "s JSON.");
       }
       importInput.value = "";
     };
@@ -185,25 +282,21 @@
   });
 
   resetBtn.addEventListener("click", function () {
-    if (!window.confirm("Discard local changes and reload the published catalog?")) {
+    if (
+      !window.confirm(
+        "Discard local " + label() + " changes and reload the published catalog?"
+      )
+    ) {
       return;
     }
-    LoriusData.clearLocal();
+    LoriusData.clearLocal(type);
     resetForm();
-    LoriusData.loadScripts().then(function (loaded) {
-      scripts = loaded;
+    LoriusData.loadCatalog(type).then(function (loaded) {
+      items = loaded;
       renderList();
       setStatus("Local changes discarded — showing the published catalog.");
     });
   });
 
-  LoriusData.loadScripts().then(function (loaded) {
-    scripts = loaded;
-    renderList();
-    if (LoriusData.hasLocalOverride()) {
-      setStatus(
-        "You have unpublished local changes. Export JSON and replace data/scripts.json to publish them."
-      );
-    }
-  });
+  loadType("scripts");
 })();

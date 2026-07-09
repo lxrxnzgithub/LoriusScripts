@@ -1,0 +1,11 @@
+{
+  "executors": [
+    {
+      "id": "example-executor",
+      "name": "Example Executor",
+      "logo": "assets/logos/example-executor.png",
+      "description": "This is a sample entry. Open the Admin Hub, switch to the Executors tab, and replace it with a real executor — name, logo, description and download link.",
+      "download": "https://example.com/download/example-executor"
+    }
+  ]
+}
